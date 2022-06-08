@@ -1,9 +1,9 @@
 const router = require('express').Router()
+const db = require('../models')
 
-const Book = require('../models/books')
 
 router.get('/seed', (req, res) => {
-    Book.insertMany([{
+    db.Book.insertMany([{
         "title": "The Shinobi Initiative",
         "description": "The reality-bending adventures of a clandestine service agency in the year 2166",
         "year": 2014,
@@ -40,14 +40,65 @@ router.get('/seed', (req, res) => {
 })
 
 
-// INDEX
+//GET all 
 router.get('/', async (req, res) => {
     try {
-        const books = await Book.find()
-
-        res.json(users)
+        const book = await db.Book.find()
+        res.json(book)
     } catch (error) {
-        res.status(500).json({ "message": String(error) })
+        console.log(error)
+        res.json({'message':'Error'})
+    }
+})
+
+//GET 
+router.get('/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        const book = await db.Book.findById(id)
+        res.json(book)
+    } catch (error) {
+        console.log(error)
+        res.json({'message':'Error'})
+    }
+})
+
+//PUT 
+router.put('/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        await db.Book.findByIdAndUpdate(id, req.body)
+        const book = await db.Book.findById(id)
+        res.json(book)
+        
+    } catch (error) {
+        console.log(error)
+        res.json({'message':'Error'})
+    }
+})
+
+
+//POST 
+router.post('/', async (req, res) => {
+    try {
+        await db.Book.create(req.body)
+        res.send('Book added')
+        
+    } catch (error) {
+        console.log(error)
+        res.json({'message':'Error'})
+    }
+})
+
+//DELETE 
+router.delete('/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        await db.Book.findByIdAndDelete(id)
+        res.send(`Book id ${id} has been deleted.`)
+    } catch (error) {
+        console.log(error)
+        res.json({'message':'Error'})
     }
 })
 
